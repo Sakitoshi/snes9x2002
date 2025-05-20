@@ -115,28 +115,18 @@ void S9xDoDMA(uint8 Channel)
    {
       if (d->AAddressFixed && Memory.FillRAM [0x4801] > 0)
       {
-         uint32 address;
+         uint8_t* in_ptr;
+         /* XXX: Should probably verify that we're DMAing from ROM?
+          * And somewhere we should make sure we're not running across a mapping boundary too. */
+         inc = !d->AAddressDecrement ? 1 : -1;
 
-         // Hacky support for pre-decompressed S-DD1 data
-         inc      = !d->AAddressDecrement ? 1 : -1;
-         address  = (((d->ABank << 16) | d->AAddress) & 0xfffff) << 4;
-
-         address |= Memory.FillRAM [0x4804 + ((d->ABank - 0xc0) >> 4)];
-         if (Settings.SDD1Pack)
+         in_ptr = GetBasePointer(((d->ABank << 16) | d->AAddress));
+         if (in_ptr)
          {
-            uint8* in_ptr = GetBasePointer(((d->ABank << 16) | d->AAddress));
             in_ptr += d->AAddress;
-
             SDD1_decompress(buffer, in_ptr, d->TransferBytes);
-            in_sdd1_dma = buffer;
          }
-         else
-         {
-            void* ptr = bsearch(&address, Memory.SDD1Index,
-                                Memory.SDD1Entries, 12, S9xCompareSDD1IndexEntries);
-            if (ptr)
-               in_sdd1_dma = *(uint32*)((uint8*) ptr + 4) + Memory.SDD1Data;
-         }
+         in_sdd1_dma = buffer;
       }
 
       Memory.FillRAM [0x4801] = 0;

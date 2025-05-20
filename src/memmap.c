@@ -205,7 +205,7 @@ bool8_32 MemoryInit ()
     memset (IPPU.TileCached [TILE_2BIT], 0, MAX_2BIT_TILES);
     memset (IPPU.TileCached [TILE_4BIT], 0, MAX_4BIT_TILES);
     memset (IPPU.TileCached [TILE_8BIT], 0, MAX_8BIT_TILES);
-    
+
     Memory.SDD1Data = NULL;
     Memory.SDD1Index = NULL;
 
