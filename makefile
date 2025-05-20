@@ -6,6 +6,8 @@ VIDEO_BACKEND = sdl
 INPUT_BACKEND = sdl
 SOUND_BACKEND = sdl
 
+STATIC_LINKING = 1
+
 PREFIX  = /opt/trimui-toolchain/bin/arm-buildroot-linux-gnueabi
 
 # define regarding OS, which compiler to use
@@ -23,14 +25,15 @@ CFLAGS	= -DLSB_FIRST -DFAST_ALIGNED_LSB_WORD_ACCESS -I. -Ilibretro/libretro-comm
 CFLAGS	+= -I./shell/emu -I./shell/scalers -I./shell/emu -I./shell/audio -I./shell/menu -I./shell/video/sdl -I./shell/input -Ishell/headers
 
 CFLAGS	+= -Ofast -fsingle-precision-constant -fno-PIC
-#CFLAGS  += -flto
+CFLAGS  += -flto
 ifndef PROFILE
 CFLAGS	+= -falign-functions=1 -falign-jumps=1 -falign-loops=1 -falign-labels=1
 endif
-CFLAGS	+= -mcpu=arm926ej-s -mtune=arm926ej-s
+#CFLAGS	+= -mcpu=arm926ej-s -mtune=arm926ej-s
+CFLAGS	+= -marm -march=armv5te -mtune=arm926ej-s
 CFLAGS	+= -DNDEBUG -DAUDIO_FRAMESKIP -DGIT_VERSION=\"$(GIT_VERSION)\" -DTRIMUI -fno-builtin -fno-exceptions -ffunction-sections -std=gnu99
 CFLAGS	+= -Wall -Wextra -pedantic -Wno-implicit-function-declaration -Wno-sign-compare -Wno-unused-variable -Wno-unused-function -Wno-uninitialized -Wno-strict-aliasing -Wno-overflow -fno-strict-overflow
-#CFLAGS	+= -Wno-implicit-fallthrough
+CFLAGS	+= -Wno-implicit-fallthrough
 
 ifeq ($(PROFILE), YES)
 CFLAGS	+= -fprofile-generate=/mnt/SDCARD/profile/snes9x2002
@@ -39,7 +42,7 @@ CFLAGS	+= -fprofile-use -fprofile-dir=./profile -fbranch-probabilities
 endif
 
 LDFLAGS = -lc -lgcc -lm $(SDL_LIBS) -Wl,--gc-sections -s
-#LDFLAGS += -flto
+LDFLAGS += -flto
 LDFLAGS += -lSDL_image -lSDL_ttf -ldl
 ifeq ($(SOUND_BACKEND), portaudio)
 LDFLAGS	+= -lasound -lportaudio
